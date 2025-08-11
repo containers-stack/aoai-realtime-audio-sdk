@@ -298,6 +298,124 @@ function appendToTextBlock(text: string) {
   textElements[textElements.length - 1].textContent += text;
 }
 
+// --- Modal controls & transcript analysis ---
+const analysisModal = document.getElementById("analysis-modal") as HTMLDivElement | null;
+const closeModalBtn = document.getElementById("close-modal") as HTMLButtonElement | null;
+const analyzeBtn = document.getElementById("analyze-transcript") as HTMLButtonElement | null;
+const modalClearDisplayBtn = document.getElementById("clear-display") as HTMLButtonElement | null;
+const insightsLoadingEl = document.getElementById("insights-loading") as HTMLDivElement | null;
+const insightsErrorEl = document.getElementById("insights-error") as HTMLDivElement | null;
+const insightsOutputEl = document.getElementById("insights-output") as HTMLDivElement | null;
+
+function openModal() {
+  if (!analysisModal) return;
+  analysisModal.classList.add("open");
+  analysisModal.setAttribute("aria-hidden", "false");
+}
+
+function closeModal() {
+  if (!analysisModal) return;
+  analysisModal.classList.remove("open");
+  analysisModal.setAttribute("aria-hidden", "true");
+}
+
+function getFullTranscript(): string {
+  const lines = Array.from(formReceivedTextContainer.querySelectorAll("p"))
+    .map((p) => (p.textContent || "").trim())
+    .filter(Boolean);
+  return lines.join("\n");
+}
+
+async function analyzeCurrentTranscript() {
+  if (!insightsLoadingEl || !insightsErrorEl || !insightsOutputEl || !analyzeBtn) return;
+
+  const transcriptRaw = getFullTranscript();
+  if (!transcriptRaw) {
+    insightsErrorEl.textContent = "No transcript to analyze.";
+    insightsErrorEl.classList.remove("hidden");
+    return;
+  }
+
+  // Optional truncate to avoid token overflow for very long sessions
+  const maxChars = 12000;
+  const transcript = transcriptRaw.length > maxChars
+    ? transcriptRaw.slice(-maxChars)
+    : transcriptRaw;
+
+  insightsErrorEl.classList.add("hidden");
+  insightsOutputEl.textContent = "";
+  insightsLoadingEl.classList.remove("hidden");
+  analyzeBtn.disabled = true;
+// to be replaced with the actual variables.
+  try {
+    const endpoint = import.meta.env.VITE_OPEN_AI_ENDPOINT || "";
+    const key = import.meta.env.VITE_OPEN_AI_KEY || "";
+    const deploymentOrModel = import.meta.env.VITE_OPEN_AI_DEPLOYMENT || "";
+
+    if (!key) {
+      throw new Error("Missing API key");
+    }
+
+    let url = "";
+    let headers: Record<string, string> = { "Content-Type": "application/json" };
+    let body: any;
+
+    const systemPrompt = "You are an expert conversation analyst. Given the full transcript, produce a concise summary, key insights, action items, and concrete recommendations.";
+
+    if (endpoint) {
+      // Azure OpenAI (Chat Completions)
+      const base = endpoint.replace(/\/$/, "");
+      const apiVersion = "2024-02-15-preview";
+      url = `${base}/openai/deployments/${deploymentOrModel}/chat/completions?api-version=${apiVersion}`;
+      headers["api-key"] = key;
+      body = {
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `Transcript:\n\n${transcript}` }
+        ],
+        temperature: isNaN(getTemperature()) ? 0.7 : getTemperature(),
+        max_tokens: 800
+      };
+    } else {
+      // OpenAI (public)
+      url = "https://api.openai.com/v1/chat/completions";
+      headers["Authorization"] = `Bearer ${key}`;
+      body = {
+        model: deploymentOrModel || "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `Transcript:\n\n${transcript}` }
+        ],
+        temperature: isNaN(getTemperature()) ? 0.7 : getTemperature(),
+        max_tokens: 800
+      };
+    }
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Analysis request failed: ${res.status} ${res.statusText} - ${text}`);
+    }
+
+    const data = await res.json();
+    // Both Azure and OpenAI Chat Completions return choices[0].message.content
+    console.log ("Analysis response:", data);
+    const content: string = data?.choices?.[0]?.message?.content || "";
+    insightsOutputEl.textContent = content || "No insights returned.";
+  } catch (err: any) {
+    insightsErrorEl.textContent = err?.message || String(err);
+    insightsErrorEl.classList.remove("hidden");
+  } finally {
+    insightsLoadingEl.classList.add("hidden");
+    analyzeBtn.disabled = false;
+  }
+}
+
 // Populate product dropdown on load
 void populateProductDropdown();
 
@@ -331,14 +449,38 @@ formStartButton.addEventListener("click", async () => {
     setFormInputState(InputState.ReadyToStart);
   }
 });
-
+// stop initate here adding popup.
 formStopButton.addEventListener("click", async () => {
   setFormInputState(InputState.Working);
   resetAudio(false);
   realtimeStreaming.close();
   setFormInputState(InputState.ReadyToStart);
+  // Show modal with options after stopping
+  openModal();
 });
 
 formClearAllButton.addEventListener("click", async () => {
   formReceivedTextContainer.innerHTML = "";
+});
+
+// Modal event wiring
+closeModalBtn?.addEventListener("click", () => closeModal());
+analysisModal?.addEventListener("click", (e) => {
+  const target = e.target as HTMLElement;
+  if (target?.dataset?.close === "true") {
+    closeModal();
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && analysisModal?.classList.contains("open")) {
+    closeModal();
+  }
+});
+
+modalClearDisplayBtn?.addEventListener("click", () => {
+  formReceivedTextContainer.innerHTML = "";
+});
+
+analyzeBtn?.addEventListener("click", () => {
+  analyzeCurrentTranscript();
 });

@@ -60,6 +60,30 @@
       </div>
     </form>
   </div>
+
+  <!-- Session Analysis Modal -->
+  <div id="analysis-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close="true"></div>
+    <div class="modal-content" role="document">
+      <div class="modal-header">
+        <h2 class="modal-title">Session Summary & Insights</h2>
+        <button id="close-modal" type="button" class="icon-btn" aria-label="Close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-actions">
+          <button id="analyze-transcript" type="button">Analyze Transcript</button>
+          <button id="clear-display" type="button" class="secondary">Clear Display</button>
+        </div>
+        <section id="insights-section">
+          <h3>Insights</h3>
+          <div id="insights-loading" class="hidden">Analyzing transcript...</div>
+          <div id="insights-error" class="error hidden"></div>
+          <div id="insights-output" class="insights-output"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="/src/main.ts"></script>
 </body>
 
