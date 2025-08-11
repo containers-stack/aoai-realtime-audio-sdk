@@ -346,7 +346,7 @@ async function analyzeCurrentTranscript() {
   insightsOutputEl.textContent = "";
   insightsLoadingEl.classList.remove("hidden");
   analyzeBtn.disabled = true;
-// to be replaced with the actual variables.
+// to be replaced with the actual variables. #TODO
   try {
     const endpoint = import.meta.env.VITE_OPEN_AI_ENDPOINT || "";
     const key = import.meta.env.VITE_OPEN_AI_KEY || "";
