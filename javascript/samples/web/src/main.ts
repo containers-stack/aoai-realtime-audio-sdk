@@ -249,8 +249,8 @@ const formStopButton =
   document.querySelector<HTMLButtonElement>("#stop-recording")!;
 const formClearAllButton =
   document.querySelector<HTMLButtonElement>("#clear-all")!;
-const formSessionInstructionsField =
-  document.querySelector<HTMLTextAreaElement>("#session-instructions")!;
+// const formSessionInstructionsField =
+//   document.querySelector<HTMLTextAreaElement>("#session-instructions")!;
 const formVoiceSelection = document.querySelector<HTMLSelectElement>("#voice")!;
 const formProductSelection = document.querySelector<HTMLSelectElement>("#product-topic")!;
 
@@ -265,12 +265,12 @@ enum InputState {
 function setFormInputState(state: InputState) {
   formStartButton.disabled = state != InputState.ReadyToStart;
   formStopButton.disabled = state != InputState.ReadyToStop;
-  formSessionInstructionsField.disabled = state != InputState.ReadyToStart;
+  // formSessionInstructionsField.disabled = state != InputState.ReadyToStart;
   formProductSelection.disabled = state != InputState.ReadyToStart;
 }
 
 function getSystemMessage(): string {
-  return formSessionInstructionsField.value || "";
+  return import.meta.env.VITE_GENERAL_SYSTEM_MESSAGE || "";
 }
 
 
