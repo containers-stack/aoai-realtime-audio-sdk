@@ -111,7 +111,11 @@ async function createConfigMessage() : Promise<SessionUpdateMessage> {
   };
 
   const systemMessage = getSystemMessage();
-  const temperature = getTemperature();
+  let temperature = 1;
+  const envTemp = import.meta.env.VITE_GENERAL_TEMPERATURE;
+  if (envTemp !== undefined && !isNaN(parseFloat(envTemp))) {
+    temperature = parseFloat(envTemp);
+  }
   const voice = getVoice();
   const product = getProductTopic();
 
@@ -130,9 +134,7 @@ async function createConfigMessage() : Promise<SessionUpdateMessage> {
       configMessage.session.instructions = productInstruction;
     }
   }
-  if (!isNaN(temperature)) {
-    configMessage.session.temperature = temperature;
-  }
+  configMessage.session.temperature = temperature;
   if (voice) {
     configMessage.session.voice = voice;
   }
@@ -249,7 +251,6 @@ const formClearAllButton =
   document.querySelector<HTMLButtonElement>("#clear-all")!;
 const formSessionInstructionsField =
   document.querySelector<HTMLTextAreaElement>("#session-instructions")!;
-const formTemperatureField = document.querySelector<HTMLInputElement>("#temperature")!;
 const formVoiceSelection = document.querySelector<HTMLSelectElement>("#voice")!;
 const formProductSelection = document.querySelector<HTMLSelectElement>("#product-topic")!;
 
@@ -272,9 +273,6 @@ function getSystemMessage(): string {
   return formSessionInstructionsField.value || "";
 }
 
-function getTemperature(): number {
-  return parseFloat(formTemperatureField.value);
-}
 
 function getVoice(): Voice {
   return formVoiceSelection.value as Voice;
@@ -373,7 +371,10 @@ async function analyzeCurrentTranscript() {
           { role: "system", content: systemPrompt },
           { role: "user", content: `Transcript:\n\n${transcript}` }
         ],
-        temperature: isNaN(getTemperature()) ? 0.7 : getTemperature(),
+        temperature: (() => {
+          const envTemp = import.meta.env.VITE_GENERAL_TEMPERATURE;
+          return envTemp !== undefined && !isNaN(parseFloat(envTemp)) ? parseFloat(envTemp) : 1;
+        })(),
         max_completion_tokens: 800
       };
     } else {
@@ -386,7 +387,7 @@ async function analyzeCurrentTranscript() {
           { role: "system", content: systemPrompt },
           { role: "user", content: `Transcript:\n\n${transcript}` }
         ],
-        temperature: isNaN(getTemperature()) ? 0.7 : getTemperature(),
+  temperature: 1,
         max_completion_tokens: 800
       };
     }
