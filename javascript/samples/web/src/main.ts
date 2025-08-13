@@ -346,11 +346,11 @@ async function analyzeCurrentTranscript() {
   insightsOutputEl.textContent = "";
   insightsLoadingEl.classList.remove("hidden");
   analyzeBtn.disabled = true;
-// to be replaced with the actual variables. #TODO
+// to be replaced with the actual variables. #TODO ANALYIZE
   try {
-    const endpoint = import.meta.env.VITE_OPEN_AI_ENDPOINT || "";
-    const key = import.meta.env.VITE_OPEN_AI_KEY || "";
-    const deploymentOrModel = import.meta.env.VITE_OPEN_AI_DEPLOYMENT || "";
+    const endpoint = import.meta.env.VITE_CHAT_OPEN_AI_ENDPOINT || "";
+    const key = import.meta.env.VITE_CHAT_OPEN_AI_KEY || "";
+    const deploymentOrModel = import.meta.env.VITE_CHAT_OPEN_AI_DEPLOYMENT || "";
 
     if (!key) {
       throw new Error("Missing API key");
@@ -359,13 +359,13 @@ async function analyzeCurrentTranscript() {
     let url = "";
     let headers: Record<string, string> = { "Content-Type": "application/json" };
     let body: any;
-
+    // TODO: customize the system prompt.
     const systemPrompt = "You are an expert conversation analyst. Given the full transcript, produce a concise summary, key insights, action items, and concrete recommendations.";
 
     if (endpoint) {
       // Azure OpenAI (Chat Completions)
       const base = endpoint.replace(/\/$/, "");
-      const apiVersion = "2024-02-15-preview";
+      const apiVersion = "2024-12-01-preview";
       url = `${base}/openai/deployments/${deploymentOrModel}/chat/completions?api-version=${apiVersion}`;
       headers["api-key"] = key;
       body = {
@@ -374,7 +374,7 @@ async function analyzeCurrentTranscript() {
           { role: "user", content: `Transcript:\n\n${transcript}` }
         ],
         temperature: isNaN(getTemperature()) ? 0.7 : getTemperature(),
-        max_tokens: 800
+        max_completion_tokens: 800
       };
     } else {
       // OpenAI (public)
@@ -387,7 +387,7 @@ async function analyzeCurrentTranscript() {
           { role: "user", content: `Transcript:\n\n${transcript}` }
         ],
         temperature: isNaN(getTemperature()) ? 0.7 : getTemperature(),
-        max_tokens: 800
+        max_completion_tokens: 800
       };
     }
 
@@ -422,9 +422,9 @@ void populateProductDropdown();
 formStartButton.addEventListener("click", async () => {
   setFormInputState(InputState.Working);
 
-  const endpoint = import.meta.env.VITE_OPEN_AI_ENDPOINT || "";
-  const key = import.meta.env.VITE_OPEN_AI_KEY || "";
-  const deploymentOrModel = import.meta.env.VITE_OPEN_AI_DEPLOYMENT || "";
+  const endpoint = import.meta.env.VITE_REALTIME_OPEN_AI_ENDPOINT || "";
+  const key = import.meta.env.VITE_REALTIME_OPEN_AI_KEY || "";
+  const deploymentOrModel = import.meta.env.VITE_REALTIME_OPEN_AI_DEPLOYMENT || "";
 
   console.log("Starting with:", { endpoint, key, deploymentOrModel });
   if (!endpoint && !deploymentOrModel) {
@@ -479,6 +479,7 @@ document.addEventListener("keydown", (e) => {
 
 modalClearDisplayBtn?.addEventListener("click", () => {
   formReceivedTextContainer.innerHTML = "";
+  closeModal();
 });
 
 analyzeBtn?.addEventListener("click", () => {
