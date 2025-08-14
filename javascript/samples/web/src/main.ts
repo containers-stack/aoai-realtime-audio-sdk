@@ -143,6 +143,61 @@ async function createConfigMessage() : Promise<SessionUpdateMessage> {
   return configMessage;
 }
 
+async function sendInitialAIMessage() {
+  try {
+    const selectedProduct = getProductTopic();
+    let initialMessage = "";
+
+    if (selectedProduct) {
+      // Get the product-specific greeting from the product data
+      const productPrompt = await getProductPrompt(selectedProduct);
+      if (productPrompt) {
+        // Extract a greeting from the product prompt or create a natural one
+        initialMessage = `Hi there! I'm interested in learning more about tennis rackets. I've been looking at the ${selectedProduct} and would love to know more about it. What can you tell me about this racket?`;
+      } else {
+        initialMessage = `Hi! I'm in the market for a new tennis racket and I'm particularly interested in the ${selectedProduct}. Could you tell me more about it?`;
+      }
+    } else {
+      initialMessage = "Hi there! I'm looking for a new tennis racket and could use some help choosing the right one. What would you recommend based on my playing style?";
+    }
+
+    if (selectedProduct) {
+      // Get the product-specific greeting from the product data
+      const productPrompt = await getProductPrompt(selectedProduct);
+      if (productPrompt) {
+        // Extract a greeting from the product prompt or create a natural one
+        initialMessage = `Hi there! I'm interested in learning more about tennis rackets. I've been looking at the ${selectedProduct} and would love to know more about it. What can you tell me about this racket?`;
+      } else {
+        initialMessage = `Hi! I'm in the market for a new tennis racket and I'm particularly interested in the ${selectedProduct}. Could you tell me more about it?`;
+      }
+    } else {
+      initialMessage = "Hi there! I'm looking for a new tennis racket and could use some help choosing the right one. What would you recommend based on my playing style?";
+    }
+
+    // Send the initial message as an assistant message to make it look like AI is starting
+    await realtimeStreaming.send({
+      type: "conversation.item.create",
+      item: {
+        type: "message",
+        role: "assistant",
+        content: [
+          {
+            type: "text",
+            text: initialMessage
+          }
+        ]
+      }
+    });
+
+    // Trigger a response to make the AI actually speak the initial message
+    await realtimeStreaming.send({
+      type: "response.create"
+    });
+
+  } catch (error) {
+    console.error("Failed to send initial AI message:", error);
+  }
+}
 async function handleRealtimeMessages() {
   for await (const message of realtimeStreaming.messages()) {
     let consoleLog = "" + message.type;
@@ -157,6 +212,8 @@ async function handleRealtimeMessages() {
           makeNewTextBlock("<< Session Started - Customer browsing tennis rackets >>");
         }
         makeNewTextBlock();
+        // Send initial AI message to start the conversation
+        await sendInitialAIMessage();
         break;
       case "response.audio_transcript.delta":
         appendToTextBlock(message.delta);
