@@ -3,12 +3,14 @@
 
 import { Player } from "./player.ts";
 import { Recorder } from "./recorder.ts";
+import { CircularAudioVisualizer } from "./visualizer.ts";
 import "./style.css";
 import { LowLevelRTClient, SessionUpdateMessage, Voice } from "rt-client";
 
 let realtimeStreaming: LowLevelRTClient;
 let audioRecorder: Recorder;
 let audioPlayer: Player;
+let audioVisualizer: CircularAudioVisualizer;
 
 // Cache for product data loaded from /products.json
 let productData: Record<string, { prompt: string; promptFile?: string }> | null = null;
@@ -226,13 +228,24 @@ async function resetAudio(startRecording: boolean) {
   if (audioPlayer) {
     audioPlayer.clear();
   }
+  if (audioVisualizer) {
+    audioVisualizer.stop();
+  }
   audioRecorder = new Recorder(processAudioRecordingBuffer);
   audioPlayer = new Player();
   audioPlayer.init(24000);
   if (startRecording) {
+    stopIdleAnimation();
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    console.log('Got media stream:', stream, 'Active tracks:', stream.getAudioTracks().length);
     audioRecorder.start(stream);
     recordingActive = true;
+    
+    // Initialize visualizer with the same audio stream
+    await audioVisualizer.initializeWithStream(stream);
+  } else {
+    // Start idle animation when not recording
+    startIdleAnimation();
   }
 }
 
@@ -247,12 +260,39 @@ const formStartButton =
   document.querySelector<HTMLButtonElement>("#start-recording")!;
 const formStopButton =
   document.querySelector<HTMLButtonElement>("#stop-recording")!;
+const formTestVisualizerButton =
+  document.querySelector<HTMLButtonElement>("#test-visualizer")!;
 const formClearAllButton =
   document.querySelector<HTMLButtonElement>("#clear-all")!;
 // const formSessionInstructionsField =
 //   document.querySelector<HTMLTextAreaElement>("#session-instructions")!;
 const formVoiceSelection = document.querySelector<HTMLSelectElement>("#voice")!;
 const formProductSelection = document.querySelector<HTMLSelectElement>("#product-topic")!;
+
+// Initialize visualizer
+const visualizerCanvas = document.querySelector<HTMLCanvasElement>("#audio-visualizer")!;
+audioVisualizer = new CircularAudioVisualizer(visualizerCanvas);
+
+// Start idle animation
+let idleAnimationId: number;
+function startIdleAnimation() {
+  const animate = () => {
+    if (!recordingActive) {
+      audioVisualizer.drawIdleState();
+      idleAnimationId = requestAnimationFrame(animate);
+    }
+  };
+  animate();
+}
+
+function stopIdleAnimation() {
+  if (idleAnimationId) {
+    cancelAnimationFrame(idleAnimationId);
+  }
+}
+
+// Start idle animation initially
+startIdleAnimation();
 
 let latestInputSpeechBlock: Element;
 
@@ -485,4 +525,10 @@ modalClearDisplayBtn?.addEventListener("click", () => {
 
 analyzeBtn?.addEventListener("click", () => {
   analyzeCurrentTranscript();
+});
+
+// Test visualizer with fake data
+formTestVisualizerButton.addEventListener("click", () => {
+  console.log("Testing visualizer with fake audio data");
+  audioVisualizer.testWithFakeData();
 });

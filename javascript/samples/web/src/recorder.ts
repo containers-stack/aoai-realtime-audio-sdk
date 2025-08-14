@@ -12,6 +12,14 @@ export class Recorder {
     this.onDataAvailable = onDataAvailable;
   }
 
+  public getAudioContext(): AudioContext | null {
+    return this.audioContext;
+  }
+
+  public getMediaStreamSource(): MediaStreamAudioSourceNode | null {
+    return this.mediaStreamSource;
+  }
+
   async start(stream: MediaStream) {
     try {
       this.audioContext = new AudioContext({ sampleRate: 24000 });
