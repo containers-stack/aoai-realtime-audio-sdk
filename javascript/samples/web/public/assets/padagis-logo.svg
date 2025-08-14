@@ -1,0 +1,29 @@
+<!-- Professional Padagis Logo SVG -->
+<svg width="140" height="48" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 48">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#005D5D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00A3A3;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background rounded rectangle -->
+  <rect width="140" height="48" rx="6" fill="url(#logoGradient)"/>
+  
+  <!-- "Padagis" text -->
+  <text x="70" y="32" 
+        font-family="Segoe UI, Arial, sans-serif" 
+        font-size="18" 
+        font-weight="600" 
+        fill="white" 
+        text-anchor="middle"
+        letter-spacing="0.5px">Padagis</text>
+  
+  <!-- TM symbol -->
+  <text x="125" y="20" 
+        font-family="Segoe UI, Arial, sans-serif" 
+        font-size="10" 
+        font-weight="400" 
+        fill="white" 
+        text-anchor="middle">™</text>
+</svg>

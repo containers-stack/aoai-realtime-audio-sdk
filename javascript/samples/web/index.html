@@ -15,53 +15,77 @@
 
 <body>
   <div id="app">
-    <div class="header">
-      <h1>🎾 Tennis Racket Sales Simulator</h1>
-      <p>You are the salesperson, the AI is the customer looking to buy a tennis racket!</p>
-    </div>
-    <div id="visualizer-container">
-      <canvas id="audio-visualizer"></canvas>
-    </div>
-    <form>
-      <div class="container">
-        <div id="received-text-container"></div>
-        <div class="controls">
-          <div class="input-group">
-          <div class="button-group">
-            <button id="start-recording" type="button">Record</button>
-            <button id="stop-recording" type="button" disabled="true">Stop</button>
-            <button id="test-visualizer" type="button">Test Visualizer</button>
+    <!-- Professional Header with Logo -->
+    <header class="header">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="logo-container">
+            <img src="/assets/padagis-logo.svg" alt="Padagis" class="company-logo" />
           </div>
-          <div class="input-group"></div>
-          <div class="input-group">
-          </div>
-          <div class="input-group">
-            <label for="voice">Voice</label>
-              <select id="voice">
-                <option></option>
-                <option>alloy</option>
-                <option>ash</option>
-                <option>ballad</option>
-                <option>coral</option>
-                <option>echo</option>
-                <option>sage</option>
-                <option>shimmer</option>
-                <option>verse</option>
-              </select>
-          </div>
-          <!-- Product Topic dropdown -->
-          <div class="input-group">
-            <label for="product-topic">Customer is interested in:</label>
-            <select id="product-topic">
-              <option value=""></option>
-            </select>
-          </div>
-          <div class="button-group">
-            <button id="clear-all" type="button">Clear all</button>
+          <div class="header-text">
+            <h1>Tennis Racket Sales Simulator</h1>
+            <p class="header-subtitle">Professional Sales Training Platform</p>
           </div>
         </div>
+        <div class="header-description">
+          <p>You are the salesperson, the AI is the customer looking to buy a tennis racket!</p>
+        </div>
       </div>
-    </form>
+    </header>
+    <main class="main-content">
+      <div id="visualizer-container">
+        <canvas id="audio-visualizer"></canvas>
+      </div>
+      <form>
+        <div class="container">
+          <div id="received-text-container">
+            <div class="conversation-placeholder">
+              <div class="placeholder-icon">💬</div>
+              <h3>Sales Conversation</h3>
+              <p>Your conversation with the AI customer will appear here. Start recording to begin the sales simulation.</p>
+            </div>
+          </div>
+          <aside class="controls">
+            <div class="control-section">
+              <h3 class="control-title">Recording Controls</h3>
+              <div class="button-group">
+                <button id="start-recording" type="button">Start Recording</button>
+                <button id="stop-recording" type="button" disabled="true">Stop Recording</button>
+              </div>
+              <div class="button-group">
+                <button id="test-visualizer" type="button">Test Visualizer</button>
+                <button id="clear-all" type="button" class="secondary">Clear All</button>
+              </div>
+            </div>
+            
+            <div class="control-section">
+              <h3 class="control-title">Configuration</h3>
+              <div class="input-group">
+                <label for="voice">AI Voice Selection</label>
+                <select id="voice">
+                  <option value="">Select a voice...</option>
+                  <option value="alloy">Alloy</option>
+                  <option value="ash">Ash</option>
+                  <option value="ballad">Ballad</option>
+                  <option value="coral">Coral</option>
+                  <option value="echo">Echo</option>
+                  <option value="sage">Sage</option>
+                  <option value="shimmer">Shimmer</option>
+                  <option value="verse">Verse</option>
+                </select>
+              </div>
+              
+              <div class="input-group">
+                <label for="product-topic">Customer Interest</label>
+                <select id="product-topic">
+                  <option value="">Select customer interest...</option>
+                </select>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </form>
+    </main>
   </div>
 
   <!-- Session Analysis Modal -->
@@ -69,7 +93,7 @@
     <div class="modal-backdrop" data-close="true"></div>
     <div class="modal-content" role="document">
       <div class="modal-header">
-        <h2 class="modal-title">Sales Performance Analysis</h2>
+        <h2 class="modal-title">📊 Sales Performance Analysis</h2>
         <button id="close-modal" type="button" class="icon-btn" aria-label="Close">×</button>
       </div>
       <div class="modal-body">

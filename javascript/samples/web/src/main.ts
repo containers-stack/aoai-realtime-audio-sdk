@@ -322,6 +322,12 @@ function getProductTopic(): string {
 }
 
 function makeNewTextBlock(text: string = "") {
+  // Remove placeholder if it exists
+  const placeholder = formReceivedTextContainer.querySelector('.conversation-placeholder');
+  if (placeholder) {
+    placeholder.remove();
+  }
+  
   let newElement = document.createElement("p");
   newElement.textContent = text;
   formReceivedTextContainer.appendChild(newElement);
@@ -540,8 +546,19 @@ formStopButton.addEventListener("click", async () => {
   openModal();
 });
 
+// Helper function to restore conversation placeholder
+function restoreConversationPlaceholder() {
+  formReceivedTextContainer.innerHTML = `
+    <div class="conversation-placeholder">
+      <div class="placeholder-icon">💬</div>
+      <h3>Sales Conversation</h3>
+      <p>Your conversation with the AI customer will appear here. Start recording to begin the sales simulation.</p>
+    </div>
+  `;
+}
+
 formClearAllButton.addEventListener("click", async () => {
-  formReceivedTextContainer.innerHTML = "";
+  restoreConversationPlaceholder();
 });
 
 // Modal event wiring
@@ -559,7 +576,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 modalClearDisplayBtn?.addEventListener("click", () => {
-  formReceivedTextContainer.innerHTML = "";
+  restoreConversationPlaceholder();
   closeModal();
 });
 
