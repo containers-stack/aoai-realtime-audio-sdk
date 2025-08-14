@@ -445,7 +445,7 @@ Focus on practical sales coaching advice to improve performance.`;
           const envTemp = import.meta.env.VITE_GENERAL_TEMPERATURE;
           return envTemp !== undefined && !isNaN(parseFloat(envTemp)) ? parseFloat(envTemp) : 0.3;
         })(),
-        max_completion_tokens: 1000
+        max_completion_tokens: 40000
       };
     } else {
       // OpenAI (public)
@@ -458,7 +458,7 @@ Focus on practical sales coaching advice to improve performance.`;
           { role: "user", content: `Sales Conversation Transcript:\n\n${transcript}` }
         ],
         temperature: 0.3,
-        max_completion_tokens: 1000
+        max_completion_tokens: 40000
       };
     }
 
@@ -474,10 +474,21 @@ Focus on practical sales coaching advice to improve performance.`;
     }
 
     const data = await res.json();
-    console.log ("Sales analysis response:", data);
     const content: string = data?.choices?.[0]?.message?.content || "";
-    insightsOutputEl.textContent = content || "No insights returned.";
+    
+    if (!content || content.trim().length === 0) {
+      // Check if there's an error in the response
+      if (data?.error) {
+        insightsOutputEl.textContent = `API Error: ${JSON.stringify(data.error)}`;
+      } else {
+        insightsOutputEl.textContent = "No insights returned from API. Please try again.";
+      }
+    } else {
+      insightsOutputEl.textContent = content;
+    }
+    
   } catch (err: any) {
+    console.error("Analysis error:", err);
     insightsErrorEl.textContent = err?.message || String(err);
     insightsErrorEl.classList.remove("hidden");
   } finally {
