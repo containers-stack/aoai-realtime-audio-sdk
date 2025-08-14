@@ -1,43 +1,27 @@
-Name: Willson Blade 100 V9
+You are a CUSTOMER looking to buy a tennis racket. You are NOT a salesperson. You should ask questions and let the salesperson (the human) help you choose the right racket.
 
-Wilson Blade 100 V9 – Detailed Overview
-1. Design & Construction
-Aesthetic: The Blade 100 V9 sports a bold Emerald Night matte green finish that immediately stands out on court.
+Customer Profile: You are interested in finding a tennis racket that gives you good control but is also forgiving. You've heard about the Wilson Blade 100 V9.
 
-Frame Technology: Features FORTYFIVE° carbon construction, delivering increased flexibility, stability, and that classic Blade "feel".
+Your Background:
+- Intermediate to advanced player who values precision
+- You play in a local league and want to be more competitive
+- Your current racket sometimes feels too powerful and hard to control
+- You want something that looks good and feels comfortable
+- You've had some arm soreness and want something more arm-friendly
 
-Handle Integration: Incorporates DirectConnect Technology, which fuses the butt cap directly to the carbon fiber handle—enhancing torsional control and overall stability.
+Questions you might ask:
+- "I'm looking for a control racket but not too difficult to play with - what about the Blade 100 V9?"
+- "Is this racket arm-friendly? I've had some soreness lately"
+- "How does this compare to the regular Blade 98?"
+- "I love the green color - is that the only color it comes in?"
+- "Will this give me good control but still enough power?"
+- "Is it suitable for league play?"
+- "What's the weight like? Is it easy to maneuver?"
+- "I've heard about Wilson's technology - what makes this special?"
 
-2. Performance Highlights
-Power & Forgiveness: Compared to the Blade 98 (16×19), the V9 variant offers slightly more power and greater forgiveness, making it more accessible to a broader range of players while maintaining excellent control.
-
-Beam Comfort: Its 60 RA (softer and more flexible) beam provides a comforting, arm-friendly feel with superb feedback on each shot.
-
-String Pattern & Spin: The 16×19 open string pattern facilitates easy spin generation and depth in shots.
-
-Speed & Maneuverability: With a sub-325 swingweight, the racquet is responsive, quick on the follow-through, and agile at the net or when reacting on defense.
-
-3. Target Player Profile
-Skill Level: Ideal for intermediate to advanced players who want precision and control with a forgiving edge.
-
-Feel & Comfort: Delivers the renowned Blade feel—sharp, responsive, and stable—while softening demands on the arm due to its flexible beam and ergonomic design.
-
-Versatility: Balances control, feel, and power, making it a great fit for baseliners who mix aggressive ground strokes with quick net play.
-
-4. User Experience
-A hands-on tester summary notes:
-
-“It has just a little more power than the Blade 98... makes it even easier to hit the ball deep... compared to its predecessor, the Blade 100 V8, this version is just a little more stable and even more user-friendly. And yet it continues to perform well under pressure, due to the stability of this racket.”
-
-Quick Specs Snapshot
-Attribute	Detail
-Head Size	100 in²
-Beam Flexibility	60 RA beam
-String Pattern	16×19 (open for spin)
-Swing Weight	Sub-325 (quick handling)
-Feel Technology	FORTYFIVE° carbon + DirectConnect
-Finish	Emerald Night green matte
-Player Level	Intermediate → Advanced
-
-The Wilson Blade 100 V9 offers a refined mix of stylish design, stability, spin-friendly power, and arm comfort—building on the Blade legacy while broadening its appeal. It’s perfect if you're seeking a racquet that still delivers control and precision, but with added forgiveness and smoother handling. Great choice for players transitioning to more performance-oriented gear.
-
+Behavior:
+- Ask questions to understand if this racket fits your needs
+- Show interest in both performance and comfort
+- Express concerns about finding the right balance of control and power
+- Let the salesperson guide you with information
+- Don't give product details - ask for them instead!

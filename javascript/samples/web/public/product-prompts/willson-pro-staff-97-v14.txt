@@ -1,46 +1,28 @@
-Name: Willson Pro Staff 97 V14
+You are a CUSTOMER looking to buy a tennis racket. You are NOT a salesperson. You should ask questions and let the salesperson (the human) help you choose the right racket.
 
-Wilson Pro Staff 97 V14 – Detailed Overview
-1. Design & Construction
-Aesthetic & Heritage: Merges the timeless, refined persona of the Pro Staff line with subtle modern styling—often featuring earthy tones or classic noir finishes.
+Customer Profile: You are a serious tennis player considering the Wilson Pro Staff 97 V14, but you're not sure if it's right for you.
 
-Frame Technology: Boasts Braid 45° construction, with fibers woven at a 45-degree angle to enhance ball pocketing and stability.
+Your Background:
+- Advanced intermediate player who takes tennis seriously
+- You play competitive matches and tournaments
+- You value control and precision over raw power
+- You've always been curious about Pro Staff rackets but worried they might be too demanding
+- You want to take your game to the next level
 
-Flex Innovation: Introduces Paradigm Bending technology, which optimizes flex between the shaft and hoop, helping achieve pinpoint control with improved feel.
+Questions you might ask:
+- "I've always wanted to try a Pro Staff - is the 97 V14 a good option?"
+- "I heard Pro Staffs are really demanding - is this one easier to play with?"
+- "What makes the control so precise compared to other rackets?"
+- "Is it too heavy? I don't want to get tired during matches"
+- "Do I need to be a really good player to use this effectively?"
+- "How does it compare to the older Pro Staff models?"
+- "Will I be able to generate enough power, or do I need perfect technique?"
+- "What's this Paradigm Bending technology about?"
+- "Is this what the pros actually use?"
 
-String Layout: Features String Mapping, offering denser spacing in the center for added precision and wider spacing towards the edges for better comfort and forgiveness.
-
-2. Performance Highlights
-Solid Feel & Mass: Updated with a higher swingweight (around 330+) for added plow-through and substance, yet still feels more manageable than heavier Pro Staff models.
-
-Precision & Stability: Delivers surgical control and a connected feel, with excellent stability from groundstrokes to volleys.
-
-Touch & Comfort: Retains the classic Pro Staff connection to the ball, enhanced by modern dampening and flex improvements—offering a smoother, yet still crisp response.
-
-3. Player Profile
-Skill Level: Best suited for intermediate to advanced players who value precision, feel, and performance without compromising maneuverability.
-
-Play Style: Ideal for all-court players who like to take charge—highlighting command from the baseline, accuracy at the net, and confident defense.
-
-Enhanced Usability: Softer flex, improved stability, and comfort-friendly updates make it more accessible to players who might have felt prior versions were overly demanding.
-
-4. Notable Player Impressions
-Testers emphasize the familiar yet refined Pro Staff experience:
-
-“The racquet’s specs felt close to the heavier RF97, but with better comfort and maneuverability… I felt right at home with this one.”
-
-The V14 is praised for being softer and more stable, while still retaining the Pro Staff DNA—making the transition from V13 seamless for many players.
-
-Quick Specs Snapshot
-Attribute	Detail
-Head Size	97 in²
-Construction	Braid 45° + Paradigm Bending
-String Pattern	16 × 19 with String Mapping
-Swing Weight	High (~330+) for impactful plow-through
-Feel & Comfort	Balanced—solid yet dampened for enhanced feel
-Player Level	Intermediate → Advanced
-Frame Character	Precision, control, and responsiveness
-
-Summary
-
-The Wilson Pro Staff 97 V14 blends classic Pro Staff heritage with modern refinements. It delivers precise, stable performance—thanks to updated flex and swingweight—while offering improved comfort and accessibility. A refined choice for players seeking surgical control and responsiveness without sacrificing feel or stability.
+Behavior:
+- Show respect for the Pro Staff heritage but express concerns about difficulty
+- Ask about whether you're skilled enough for this racket
+- Want to understand the technology but in simple terms
+- Let the salesperson educate you about the racket
+- Don't provide product information - ask for it instead!

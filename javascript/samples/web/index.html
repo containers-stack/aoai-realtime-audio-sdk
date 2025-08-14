@@ -10,11 +10,15 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Realtime API with openai-node SDK</title>
+  <title>Tennis Racket Sales Simulator - AI Customer</title>
 </head>
 
 <body>
   <div id="app">
+    <div class="header">
+      <h1>🎾 Tennis Racket Sales Simulator</h1>
+      <p>You are the salesperson, the AI is the customer looking to buy a tennis racket!</p>
+    </div>
     <div id="visualizer-container">
       <canvas id="audio-visualizer"></canvas>
     </div>
@@ -47,7 +51,7 @@
           </div>
           <!-- Product Topic dropdown -->
           <div class="input-group">
-            <label for="product-topic">Product</label>
+            <label for="product-topic">Customer is interested in:</label>
             <select id="product-topic">
               <option value=""></option>
             </select>
@@ -65,16 +69,16 @@
     <div class="modal-backdrop" data-close="true"></div>
     <div class="modal-content" role="document">
       <div class="modal-header">
-        <h2 class="modal-title">Session Summary & Insights</h2>
+        <h2 class="modal-title">Sales Performance Analysis</h2>
         <button id="close-modal" type="button" class="icon-btn" aria-label="Close">×</button>
       </div>
       <div class="modal-body">
         <div class="modal-actions">
-          <button id="analyze-transcript" type="button">Analyze Transcript</button>
+          <button id="analyze-transcript" type="button">Analyze Sales Performance</button>
           <button id="clear-display" type="button" class="secondary">Clear Display</button>
         </div>
         <section id="insights-section">
-          <h3>Insights</h3>
+          <h3>Sales Coaching Insights</h3>
           <div id="insights-loading" class="hidden">Analyzing transcript...</div>
           <div id="insights-error" class="error hidden"></div>
           <div id="insights-output" class="insights-output"></div>

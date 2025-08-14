@@ -9,8 +9,27 @@ body {
   flex-direction: column;
 }
 
+.header {
+  background: linear-gradient(135deg, #2d5a27, #4a7c59);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.header p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.9rem;
+}
+
 #visualizer-container {
-  height: 40vh;
+  height: 35vh;
   background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
   display: flex;
   align-items: center;
@@ -29,7 +48,7 @@ body {
 
 .container {
   display: flex;
-  height: 60vh;
+  height: 55vh;
   margin: 0;
 }
 

@@ -1,55 +1,27 @@
-Name: Willson Shift 99 V1
+You are a CUSTOMER looking to buy a tennis racket. You are NOT a salesperson. You should ask questions and let the salesperson (the human) help you choose the right racket.
 
-Wilson Shift 99 V1 – Detailed Overview
-1. Design & Technology
-Innovative Bending Profile: Engineered to be torsionally stiff horizontally for stability, yet laterally flexible to enhance spin and feel, using patent-pending ARC 3D frame geometry.
+Customer Profile: You are interested in finding a tennis racket that suits your playing style. You've heard about the Wilson Shift 99 V1 but you want to learn more before deciding.
 
-Player-Driven Development: Crafted based on extensive feedback from players worldwide, refined by Wilson’s W|Labs innovation team.
+Your Background:
+- Intermediate tennis player looking to improve your game
+- You play 2-3 times per week at a local club
+- Currently using an older racket that doesn't generate much spin
+- You love aggressive baseline play and want more spin potential
+- Budget is flexible for the right racket
 
-Aesthetic Touch: Features a pearlescent, arctic-prism finish that shifts color in the light for a sleek, futuristic look.
+Questions you might ask:
+- "I've heard about the Wilson Shift 99 V1, can you tell me about it?"
+- "I'm looking for a racket that helps with spin - would this be good?"
+- "How heavy is it? Will it tire me out during long matches?"
+- "What makes this different from other Wilson rackets?"
+- "Is it good for someone at my level?"
+- "I play mostly from the baseline - is this racket suitable?"
+- "What about the price range?"
+- "Are there any downsides I should know about?"
 
-Eco-friendly Details: Utilizes plant-based materials (Agiplast) for the end cap, bumper, and grommets to reduce environmental impact.
-
-2. Performance Characteristics
-Spin & Control: The 16×20 string pattern delivers a balanced blend of spin, control, and power.
-
-Power & Feel: Provides effortless power that enables aggressive, offensive tennis with excellent feedback.
-
-Groundstroke & Baseline Play: Offers high spin potential, stability, and a responsive feel—especially with topspin strokes.
-
-Versatility: Aimed at all-court players, it performs well across strokes and speeds, offering controlled power with a modern feel.
-
-3. Technical Specifications
-Attribute	Detail
-Head Size	99 in² (639 cm²)
-Length	27 in
-Weight (Unstrung)	~300 g / 10.6 oz
-Weight (Strung)	~316–318 g / 11.2 oz
-Balance	~6 pts Head Light (32.4 cm)
-Beam Width	~23.5 mm (tapered)
-String Pattern	16×20
-Flex / Stiffness	~67 RA
-Swingweight	~313–317 kg·cm²
-Composition	High-performance graphite
-Grip Type	Wilson Pro Performance
-Recommended Tension	48–58 lb
-Power Level	Low to Medium
-Colors / Finish	Pearlescent, colour-shifting
-
-4. Player Profile
-Skill Level: Best suited for intermediate to advanced all-court players who generate their own spin and seek precision with dynamic response.
-
-Playing Style: Great for those who love to brush up on the ball, create heavy spin, and transition between baseline aggression and net play.
-
-Feel & Comfort: The combination of stiffness and lateral flex creates a crisp, comfortable, and responsive feel—especially rewarding for players with fast swing speeds.
-
-5. User Feedback Highlights
-Rewards spin-oriented games—especially brushing up on the ball for heavy topspin.
-
-Strong stability and offensive potential while remaining quick to maneuver.
-
-Flatter hitters may find it slightly less predictable on low, flat strokes.
-
-Summary
-The Wilson Shift 99 V1 is built for modern spin and precision, with a unique frame design that bends laterally for enhanced rotation while staying stable through impact. It offers controlled power, versatility, and a premium, eco-friendly build. Perfect for players who thrive on spin-heavy, aggressive tennis.
-
+Behavior:
+- Ask questions to understand if this racket fits your needs
+- Let the salesperson explain features and benefits
+- Show genuine interest but also some hesitation (normal customer behavior)
+- Ask for comparisons if you're unsure
+- Don't give product information - ask for it instead!

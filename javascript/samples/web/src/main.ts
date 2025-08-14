@@ -112,7 +112,6 @@ async function createConfigMessage() : Promise<SessionUpdateMessage> {
     }
   };
 
-  const systemMessage = getSystemMessage();
   let temperature = 1;
   const envTemp = import.meta.env.VITE_GENERAL_TEMPERATURE;
   if (envTemp !== undefined && !isNaN(parseFloat(envTemp))) {
@@ -121,21 +120,21 @@ async function createConfigMessage() : Promise<SessionUpdateMessage> {
   const voice = getVoice();
   const product = getProductTopic();
 
-  if (systemMessage) {
-    configMessage.session.instructions = systemMessage;
-  }
+  // Base system message for customer role-play - emphasize customer role
+  let baseInstructions = "You are a CUSTOMER looking to buy a tennis racket. You are NOT a salesperson. The human is the salesperson who will help you. Ask questions, express your needs, and let them guide you to find the right racket. Do not provide product information - ask for it instead. Start the conversation by explaining what you're looking for.";
 
   if (product) {
     const productPrompt = await getProductPrompt(product);
-    const productInstruction = productPrompt
-      ? `Product context (${product}): ${productPrompt}`
-      : `The topic is ${product}.`;
-    if (configMessage.session.instructions) {
-      configMessage.session.instructions += " " + productInstruction;
+    if (productPrompt) {
+      // Use the product-specific customer persona
+      baseInstructions = productPrompt;
     } else {
-      configMessage.session.instructions = productInstruction;
+      // Fallback if no product prompt is found
+      baseInstructions += ` You are specifically interested in learning about the ${product}. Ask the salesperson to tell you about it.`;
     }
   }
+
+  configMessage.session.instructions = baseInstructions;
   configMessage.session.temperature = temperature;
   if (voice) {
     configMessage.session.voice = voice;
@@ -151,7 +150,12 @@ async function handleRealtimeMessages() {
     switch (message.type) {
       case "session.created":
         setFormInputState(InputState.ReadyToStop);
-        makeNewTextBlock("<< Session Started >>");
+        const selectedProduct = getProductTopic();
+        if (selectedProduct) {
+          makeNewTextBlock(`<< Session Started - Customer interested in ${selectedProduct} >>`);
+        } else {
+          makeNewTextBlock("<< Session Started - Customer browsing tennis rackets >>");
+        }
         makeNewTextBlock();
         break;
       case "response.audio_transcript.delta":
@@ -309,11 +313,6 @@ function setFormInputState(state: InputState) {
   formProductSelection.disabled = state != InputState.ReadyToStart;
 }
 
-function getSystemMessage(): string {
-  return import.meta.env.VITE_GENERAL_SYSTEM_MESSAGE || "";
-}
-
-
 function getVoice(): Voice {
   return formVoiceSelection.value as Voice;
 }
@@ -384,7 +383,7 @@ async function analyzeCurrentTranscript() {
   insightsOutputEl.textContent = "";
   insightsLoadingEl.classList.remove("hidden");
   analyzeBtn.disabled = true;
-// to be replaced with the actual variables. #TODO ANALYIZE
+
   try {
     const endpoint = import.meta.env.VITE_CHAT_OPEN_AI_ENDPOINT || "";
     const key = import.meta.env.VITE_CHAT_OPEN_AI_KEY || "";
@@ -397,8 +396,39 @@ async function analyzeCurrentTranscript() {
     let url = "";
     let headers: Record<string, string> = { "Content-Type": "application/json" };
     let body: any;
-    // TODO: customize the system prompt.
-    const systemPrompt = "You are an expert conversation analyst. Given the full transcript, produce a concise summary, key insights, action items, and concrete recommendations.";
+    
+    // Get the selected product for context
+    const selectedProduct = getProductTopic();
+    
+    // Create product-specific analysis prompt
+    let systemPrompt = "You are an expert sales coach analyzing a tennis racket sales conversation. ";
+    
+    if (selectedProduct && selectedProduct !== "General Customer (browsing)") {
+      systemPrompt += `The customer was interested in the ${selectedProduct}. `;
+      
+      // Add product-specific coaching based on the racket
+      if (selectedProduct.includes("Shift 99 V1")) {
+        systemPrompt += "This racket is for players who want spin and control with modern technology. Focus on how well the salesperson explained spin benefits, eco-friendly features, and the innovative design. ";
+      } else if (selectedProduct.includes("Blade 100 V9")) {
+        systemPrompt += "This racket balances control with forgiveness, perfect for intermediate to advanced players. Focus on how well the salesperson addressed comfort, control vs. power balance, and the appealing design. ";
+      } else if (selectedProduct.includes("Pro Staff 97 V14")) {
+        systemPrompt += "This is a demanding control racket for serious players. Focus on how well the salesperson assessed the customer's skill level, explained the heritage, and addressed concerns about difficulty. ";
+      }
+    } else {
+      systemPrompt += "This was a general consultation where the customer was browsing for rackets. Focus on how well the salesperson identified customer needs and guided them toward appropriate options. ";
+    }
+    
+    systemPrompt += `
+    
+Please provide:
+1. **Sales Performance Summary**: How effectively did the salesperson handle the customer's questions and concerns?
+2. **Key Strengths**: What did the salesperson do well in terms of product knowledge, customer service, and sales technique?
+3. **Areas for Improvement**: What could the salesperson have done better? Were there missed opportunities?
+4. **Customer Engagement**: How engaged was the customer? Did they seem satisfied with the information provided?
+5. **Action Items**: Specific recommendations for improving future sales conversations
+6. **Product Knowledge Assessment**: How well did the salesperson demonstrate knowledge of the tennis racket features and benefits?
+
+Focus on practical sales coaching advice to improve performance.`;
 
     if (endpoint) {
       // Azure OpenAI (Chat Completions)
@@ -409,13 +439,13 @@ async function analyzeCurrentTranscript() {
       body = {
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: `Transcript:\n\n${transcript}` }
+          { role: "user", content: `Sales Conversation Transcript:\n\n${transcript}` }
         ],
         temperature: (() => {
           const envTemp = import.meta.env.VITE_GENERAL_TEMPERATURE;
-          return envTemp !== undefined && !isNaN(parseFloat(envTemp)) ? parseFloat(envTemp) : 1;
+          return envTemp !== undefined && !isNaN(parseFloat(envTemp)) ? parseFloat(envTemp) : 0.3;
         })(),
-        max_completion_tokens: 800
+        max_completion_tokens: 1000
       };
     } else {
       // OpenAI (public)
@@ -425,10 +455,10 @@ async function analyzeCurrentTranscript() {
         model: deploymentOrModel || "gpt-4o-mini",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: `Transcript:\n\n${transcript}` }
+          { role: "user", content: `Sales Conversation Transcript:\n\n${transcript}` }
         ],
-  temperature: 1,
-        max_completion_tokens: 800
+        temperature: 0.3,
+        max_completion_tokens: 1000
       };
     }
 
@@ -444,8 +474,7 @@ async function analyzeCurrentTranscript() {
     }
 
     const data = await res.json();
-    // Both Azure and OpenAI Chat Completions return choices[0].message.content
-    console.log ("Analysis response:", data);
+    console.log ("Sales analysis response:", data);
     const content: string = data?.choices?.[0]?.message?.content || "";
     insightsOutputEl.textContent = content || "No insights returned.";
   } catch (err: any) {
