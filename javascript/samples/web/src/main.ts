@@ -121,7 +121,7 @@ async function createConfigMessage() : Promise<SessionUpdateMessage> {
   const product = getProductTopic();
 
   // Get system message from environment variable, with fallback to default
-  let baseInstructions = import.meta.env.VITE_GENERAL_SYSTEM_MESSAGE || "You are a CUSTOMER looking to buy a tennis racket. You are NOT a salesperson. The human is the salesperson who will help you. Ask questions, express your needs, and let them guide you to find the right racket. Do not provide product information - ask for it instead. Start the conversation by explaining what you're looking for.";
+  let baseInstructions = import.meta.env.VITE_GENERAL_SYSTEM_MESSAGE || "";
 
   if (product) {
     const productPrompt = await getProductPrompt(product);
@@ -130,7 +130,7 @@ async function createConfigMessage() : Promise<SessionUpdateMessage> {
       baseInstructions = productPrompt;
     } else {
       // Fallback if no product prompt is found
-      baseInstructions += ` You are specifically interested in learning about the ${product}. Ask the salesperson to tell you about it.`;
+      baseInstructions += ` You are specifically interested in learning about the ${product}. Ask the sales representative to tell you about this medication and how it can help with your health needs.`;
     }
   }
 
@@ -153,25 +153,12 @@ async function sendInitialAIMessage() {
       const productPrompt = await getProductPrompt(selectedProduct);
       if (productPrompt) {
         // Extract a greeting from the product prompt or create a natural one
-        initialMessage = `Hi there! I'm interested in learning more about tennis rackets. I've been looking at the ${selectedProduct} and would love to know more about it. What can you tell me about this racket?`;
+        initialMessage = `Hi there! I'm looking for some help with OTC medications. I've been considering the ${selectedProduct} and would love to know more about it. What can you tell me about this medication?`;
       } else {
-        initialMessage = `Hi! I'm in the market for a new tennis racket and I'm particularly interested in the ${selectedProduct}. Could you tell me more about it?`;
+        initialMessage = `Hi! I'm looking for OTC medication and I'm particularly interested in the ${selectedProduct}. Could you tell me more about it?`;
       }
     } else {
-      initialMessage = "Hi there! I'm looking for a new tennis racket and could use some help choosing the right one. What would you recommend based on my playing style?";
-    }
-
-    if (selectedProduct) {
-      // Get the product-specific greeting from the product data
-      const productPrompt = await getProductPrompt(selectedProduct);
-      if (productPrompt) {
-        // Extract a greeting from the product prompt or create a natural one
-        initialMessage = `Hi there! I'm interested in learning more about tennis rackets. I've been looking at the ${selectedProduct} and would love to know more about it. What can you tell me about this racket?`;
-      } else {
-        initialMessage = `Hi! I'm in the market for a new tennis racket and I'm particularly interested in the ${selectedProduct}. Could you tell me more about it?`;
-      }
-    } else {
-      initialMessage = "Hi there! I'm looking for a new tennis racket and could use some help choosing the right one. What would you recommend based on my playing style?";
+      initialMessage = "Hi there! I'm looking for some OTC medication and could use some help choosing the right one. What would you recommend based on my needs?";
     }
 
     // Send the initial message as an assistant message to make it look like AI is starting
@@ -209,7 +196,7 @@ async function handleRealtimeMessages() {
         if (selectedProduct) {
           makeNewTextBlock(`<< Session Started - Customer interested in ${selectedProduct} >>`);
         } else {
-          makeNewTextBlock("<< Session Started - Customer browsing tennis rackets >>");
+          makeNewTextBlock("<< Session Started - Customer looking for OTC medications >>");
         }
         makeNewTextBlock();
         // Send initial AI message to start the conversation
@@ -464,34 +451,38 @@ async function analyzeCurrentTranscript() {
     const selectedProduct = getProductTopic();
     
     // Create product-specific analysis prompt
-    let systemPrompt = "You are an expert sales coach analyzing a tennis racket sales conversation. ";
+    let systemPrompt = "You are an expert pharmaceutical sales coach analyzing an OTC medication sales consultation. ";
     
     if (selectedProduct && selectedProduct !== "General Customer (browsing)") {
       systemPrompt += `The customer was interested in the ${selectedProduct}. `;
       
-      // Add product-specific coaching based on the racket
-      if (selectedProduct.includes("Shift 99 V1")) {
-        systemPrompt += "This racket is for players who want spin and control with modern technology. Focus on how well the salesperson explained spin benefits, eco-friendly features, and the innovative design. ";
-      } else if (selectedProduct.includes("Blade 100 V9")) {
-        systemPrompt += "This racket balances control with forgiveness, perfect for intermediate to advanced players. Focus on how well the salesperson addressed comfort, control vs. power balance, and the appealing design. ";
-      } else if (selectedProduct.includes("Pro Staff 97 V14")) {
-        systemPrompt += "This is a demanding control racket for serious players. Focus on how well the salesperson assessed the customer's skill level, explained the heritage, and addressed concerns about difficulty. ";
+      // Add product-specific coaching based on the medication
+      if (selectedProduct.includes("Ibuprofen")) {
+        systemPrompt += "This is an NSAID pain reliever for minor aches and pains. Focus on how well the sales representative explained pain relief benefits, dosing guidelines, potential stomach concerns, and compared it with other pain relievers. ";
+      } else if (selectedProduct.includes("Acetaminophen")) {
+        systemPrompt += "This is a pain and fever reliever that's gentle on the stomach. Focus on how well the sales representative addressed pain/fever relief benefits, liver safety considerations, and maximum daily dosing. ";
+      } else if (selectedProduct.includes("Diphenhydramine")) {
+        systemPrompt += "This is a sleep aid medication. Focus on how well the sales representative explained sleep benefits, next-day drowsiness concerns, dependency questions, and proper usage timing. ";
+      } else if (selectedProduct.includes("Loratadine")) {
+        systemPrompt += "This is a non-drowsy allergy medication. Focus on how well the sales representative explained allergy relief benefits, non-drowsy advantages, and daily usage for seasonal allergies. ";
+      } else if (selectedProduct.includes("Omeprazole")) {
+        systemPrompt += "This is an acid reducer for frequent heartburn. Focus on how well the sales representative explained heartburn prevention vs. treatment, proper usage timing, and long-term use considerations. ";
       }
     } else {
-      systemPrompt += "This was a general consultation where the customer was browsing for rackets. Focus on how well the salesperson identified customer needs and guided them toward appropriate options. ";
+      systemPrompt += "This was a general consultation where the customer was seeking OTC medication guidance. Focus on how well the sales representative identified customer health needs and guided them toward appropriate medication options. ";
     }
     
     systemPrompt += `
     
 Please provide:
-1. **Sales Performance Summary**: How effectively did the salesperson handle the customer's questions and concerns?
-2. **Key Strengths**: What did the salesperson do well in terms of product knowledge, customer service, and sales technique?
-3. **Areas for Improvement**: What could the salesperson have done better? Were there missed opportunities?
-4. **Customer Engagement**: How engaged was the customer? Did they seem satisfied with the information provided?
-5. **Action Items**: Specific recommendations for improving future sales conversations
-6. **Product Knowledge Assessment**: How well did the salesperson demonstrate knowledge of the tennis racket features and benefits?
+1. **Sales Performance Summary**: How effectively did the sales representative handle the customer's health-related questions and concerns?
+2. **Key Strengths**: What did the sales representative do well in terms of product knowledge, customer safety guidance, and professional consultation technique?
+3. **Areas for Improvement**: What could the sales representative have done better? Were there missed opportunities to address safety or efficacy concerns?
+4. **Customer Engagement**: How engaged was the customer? Did they seem satisfied with the medication information and safety guidance provided?
+5. **Action Items**: Specific recommendations for improving future pharmaceutical consultations
+6. **Product Knowledge Assessment**: How well did the sales representative demonstrate knowledge of the OTC medication's benefits, proper usage, and safety considerations?
 
-Focus on practical sales coaching advice to improve performance.`;
+Focus on practical pharmaceutical sales coaching advice to improve performance while ensuring customer safety and regulatory compliance.`;
 
     if (endpoint) {
       // Azure OpenAI (Chat Completions)
