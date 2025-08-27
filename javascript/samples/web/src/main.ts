@@ -120,8 +120,8 @@ async function createConfigMessage() : Promise<SessionUpdateMessage> {
   const voice = getVoice();
   const product = getProductTopic();
 
-  // Base system message for customer role-play - emphasize customer role
-  let baseInstructions = "You are a CUSTOMER looking to buy a tennis racket. You are NOT a salesperson. The human is the salesperson who will help you. Ask questions, express your needs, and let them guide you to find the right racket. Do not provide product information - ask for it instead. Start the conversation by explaining what you're looking for.";
+  // Get system message from environment variable, with fallback to default
+  let baseInstructions = import.meta.env.VITE_GENERAL_SYSTEM_MESSAGE || "You are a CUSTOMER looking to buy a tennis racket. You are NOT a salesperson. The human is the salesperson who will help you. Ask questions, express your needs, and let them guide you to find the right racket. Do not provide product information - ask for it instead. Start the conversation by explaining what you're looking for.";
 
   if (product) {
     const productPrompt = await getProductPrompt(product);
