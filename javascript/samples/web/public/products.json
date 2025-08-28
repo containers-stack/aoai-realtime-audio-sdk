@@ -1,8 +1,4 @@
 {
   "General Customer (browsing)": { "prompt": "", "promptFile": "general-customer.txt" },
-  "Ibuprofen 200mg Tablets": { "prompt": "", "promptFile": "ibuprofen-200mg.txt" },
-  "Acetaminophen 500mg Caplets": { "prompt": "", "promptFile": "acetaminophen-500mg.txt" },
-  "Diphenhydramine 25mg Sleep Aid": { "prompt": "", "promptFile": "diphenhydramine-25mg.txt" },
-  "Loratadine 10mg Allergy Relief": { "prompt": "", "promptFile": "loratadine-10mg.txt" },
-  "Omeprazole 20mg Acid Reducer": { "prompt": "", "promptFile": "omeprazole-20mg.txt" }
+  "Naloxone Emergency Overdose Reversal": { "prompt": "", "promptFile": "naloxone.txt" }
 }
