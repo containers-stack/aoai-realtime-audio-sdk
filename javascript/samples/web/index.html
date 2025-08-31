@@ -10,7 +10,7 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Padagis OTC Sales Training - AI Customer Simulator</title>
+  <title>Padagis Sales Training - AI Customer Simulator</title>
 </head>
 
 <body>
@@ -28,7 +28,7 @@
           </div>
         </div>
         <div class="header-description">
-          <p>You are the sales representative, the AI is the customer looking for OTC medications!</p>
+          <p>You are the sales representative, the AI is the customer looking for Padagis products!</p>
         </div>
       </div>
     </header>
@@ -93,20 +93,34 @@
     <div class="modal-backdrop" data-close="true"></div>
     <div class="modal-content" role="document">
       <div class="modal-header">
-        <h2 class="modal-title">📊 Pharmaceutical Sales Performance Analysis</h2>
-        <button id="close-modal" type="button" class="icon-btn" aria-label="Close">×</button>
+        <h1 class="modal-title">Pharmaceutical Sales Performance Analysis</h1>
+        <div class="header-actions">
+          <button id="export-analysis" type="button" class="export-btn">Export</button>
+          <button id="close-modal" type="button" class="close-btn" aria-label="Close">×</button>
+        </div>
       </div>
       <div class="modal-body">
-        <div class="modal-actions">
-          <button id="analyze-transcript" type="button">Analyze Sales Performance</button>
-          <button id="clear-display" type="button" class="secondary">Clear Display</button>
+        <div class="action-bar">
+          <button id="analyze-transcript" type="button" class="analyze-btn">Analyze Sales Performance</button>
+          <button id="clear-display" type="button" class="clear-btn">Clear Display</button>
         </div>
-        <section id="insights-section">
-          <h3>Sales Coaching Insights</h3>
-          <div id="insights-loading" class="hidden">Analyzing transcript...</div>
-          <div id="insights-error" class="error hidden"></div>
-          <div id="insights-output" class="insights-output"></div>
-        </section>
+        <div id="insights-loading" class="loading-state hidden">
+            <span>Analyzing sales performance...</span>
+          </div>
+          <div id="insights-error" class="error-state hidden">
+            <div class="error-content">
+              <strong>Analysis Error</strong>
+              <p id="error-message"></p>
+            </div>
+          </div>
+          <div id="insights-output" class="analysis-container">
+            <div class="no-analysis-placeholder">
+              <div class="placeholder-icon">�</div>
+              <h4>Ready for Analysis</h4>
+              <p>Click "Analyze Sales Performance" to get detailed coaching insights on your pharmaceutical sales conversation.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

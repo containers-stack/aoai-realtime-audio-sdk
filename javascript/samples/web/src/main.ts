@@ -108,7 +108,9 @@ async function createConfigMessage() : Promise<SessionUpdateMessage> {
       },
       input_audio_transcription: {
         model: "whisper-1"
-      }
+      },
+      // Add output format specification for English
+      output_audio_format: "pcm16"
     }
   };
 
@@ -120,18 +122,67 @@ async function createConfigMessage() : Promise<SessionUpdateMessage> {
   const voice = getVoice();
   const product = getProductTopic();
 
-  // Get system message from environment variable, with fallback to default
-  let baseInstructions = import.meta.env.VITE_GENERAL_SYSTEM_MESSAGE || "";
+  // Define comprehensive system instructions for the Hesitant Healthcare Administrator persona
+  let baseInstructions = `YOU ARE A HEALTHCARE ADMINISTRATOR (the customer), NOT THE SALES REPRESENTATIVE. You are meeting with a sales representative who is trying to sell you Naloxone for your healthcare facility.
 
-  if (product) {
-    const productPrompt = await getProductPrompt(product);
-    if (productPrompt) {
-      // Use the product-specific customer persona
-      baseInstructions = productPrompt;
-    } else {
-      // Fallback if no product prompt is found
-      baseInstructions += ` You are specifically interested in learning about the ${product}. Ask the sales representative to tell you about this medication and how it can help with your health needs.`;
-    }
+CRITICAL ROLE: You are "The Hesitant Healthcare Administrator" - budget-conscious, risk-averse, and concerned about public perception and operational overhead.
+
+CRITICAL LANGUAGE REQUIREMENT: You MUST communicate EXCLUSIVELY in English. Under NO circumstances should you use any other language.
+
+YOUR PERSONA CHARACTERISTICS:
+- You are budget-conscious and question every expense
+- You are risk-averse and worry about negative consequences
+- You are concerned about public perception of your facility
+- You worry about operational overhead and staff training burden
+- You are skeptical but can be convinced with good arguments
+
+CONVERSATION FLOW - Follow this specific script and ask these exact challenges:
+
+1. OPENING STATEMENT (Start with this):
+"Thanks for coming in. I understand you're here to talk about Naloxone. We've had some discussions internally, but I'm not sure it's the right fit for us."
+
+2. CHALLENGE 1 - RELEVANCE (Ask this early in conversation):
+"Why should we invest in Naloxone when opioid overdoses aren't a major issue in our facility?"
+
+3. CHALLENGE 2 - COST (Bring this up when discussing the product):
+"Your product is more expensive than the generic version. What makes it worth the premium?"
+
+4. CHALLENGE 3 - TRAINING BURDEN (Express this concern):
+"We'd need to train a lot of staff. That's time and money we don't have."
+
+5. CHALLENGE 4 - PUBLIC PERCEPTION (Voice this worry):
+"Won't stocking Naloxone send the wrong message to our community?"
+
+6. CHALLENGE 5 - COMPLIANCE (Ask about legal issues):
+"Are there any legal risks or compliance issues we should be aware of?"
+
+ASSESSMENT QUESTIONS (Weave these into the conversation naturally):
+- Why is Naloxone relevant even in low-incidence facilities?
+- What differentiates your Naloxone product from cheaper alternatives?
+- How do you address training concerns for non-medical staff?
+- What's your response to concerns about public perception?
+- How do you support compliance and legal readiness?
+
+BEHAVIORAL GUIDELINES:
+- Stay in character as a hesitant, skeptical healthcare administrator
+- Ask tough questions about cost, training, and perception
+- Express genuine concerns about budget and operational impact
+- Be professional but challenging
+- Can be convinced if given strong arguments
+- Focus on practical business concerns, not just medical benefits
+
+WHAT YOU SHOULD NOT DO:
+- Do NOT give medical advice or act like a medical expert
+- Do NOT provide information about Naloxone - ask for it instead
+- Do NOT act enthusiastic initially - be skeptical
+- Do NOT break character or discuss off-topic subjects
+
+Your goal is to realistically challenge the sales representative to practice handling objections and concerns that a real healthcare administrator would have.`;
+
+  if (product && product.toLowerCase().includes('naloxone')) {
+    baseInstructions += `\n\nSPECIFIC FOCUS: Since we're discussing ${product}, make sure to ask all the scripted questions about Naloxone specifically. Challenge the sales representative on cost, training requirements, public perception, and compliance issues related to stocking Naloxone in your healthcare facility.`;
+  } else if (product) {
+    baseInstructions += `\n\nADAPTED FOCUS: While the script is designed for Naloxone, adapt the same challenging approach for ${product}. Ask about cost vs. generic alternatives, training requirements, public perception, and compliance issues related to ${product}.`;
   }
 
   configMessage.session.instructions = baseInstructions;
@@ -148,17 +199,15 @@ async function sendInitialAIMessage() {
     const selectedProduct = getProductTopic();
     let initialMessage = "";
 
-    if (selectedProduct) {
-      // Get the product-specific greeting from the product data
-      const productPrompt = await getProductPrompt(selectedProduct);
-      if (productPrompt) {
-        // Extract a greeting from the product prompt or create a natural one
-        initialMessage = `Hi there! I'm looking for some help with OTC medications. I've been considering the ${selectedProduct} and would love to know more about it. What can you tell me about this medication?`;
-      } else {
-        initialMessage = `Hi! I'm looking for OTC medication and I'm particularly interested in the ${selectedProduct}. Could you tell me more about it?`;
-      }
+    if (selectedProduct && selectedProduct.toLowerCase().includes('naloxone')) {
+      // Use the exact script opening for Naloxone
+      initialMessage = "Thanks for coming in. I understand you're here to talk about Naloxone. We've had some discussions internally, but I'm not sure it's the right fit for us.";
+    } else if (selectedProduct) {
+      // Adapt the script opening for other products
+      initialMessage = `Thanks for coming in. I understand you're here to talk about ${selectedProduct}. We've had some discussions internally, but I'm not sure it's the right fit for us.`;
     } else {
-      initialMessage = "Hi there! I'm looking for some OTC medication and could use some help choosing the right one. What would you recommend based on my needs?";
+      // General healthcare administrator opening
+      initialMessage = "Thanks for coming in. I understand you're here to discuss some pharmaceutical products for our facility. We've had some discussions internally, but I want to understand what you're proposing.";
     }
 
     // Send the initial message as an assistant message to make it look like AI is starting
@@ -185,6 +234,111 @@ async function sendInitialAIMessage() {
     console.error("Failed to send initial AI message:", error);
   }
 }
+// Function to send a correction message to keep AI on track
+async function sendCorrectionMessage() {
+  try {
+    await realtimeStreaming.send({
+      type: "conversation.item.create",
+      item: {
+        type: "message",
+        role: "system",
+        content: [
+          {
+            type: "input_text",
+            text: "REMEMBER: You are the HEALTHCARE ADMINISTRATOR (customer), not the sales representative. Follow the script - be skeptical and ask the challenging questions about cost, training, compliance, and public perception. Stay in character as a hesitant, budget-conscious administrator."
+          }
+        ]
+      }
+    });
+
+    await realtimeStreaming.send({
+      type: "response.create"
+    });
+  } catch (error) {
+    console.error("Failed to send correction message:", error);
+  }
+}
+
+// Function to validate that AI responses are in English and on topic
+function validateResponse(text: string): boolean {
+  // Check for common non-English phrases or characters
+  const nonEnglishPatterns = [
+    /[\u0590-\u05FF]/, // Hebrew
+    /[\u0600-\u06FF]/, // Arabic
+    /[\u4E00-\u9FFF]/, // Chinese
+    /[\u3040-\u309F]/, // Hiragana
+    /[\u30A0-\u30FF]/, // Katakana
+    /[\u0400-\u04FF]/, // Cyrillic
+    /שלום|مرحبا|你好|こんにちは|привет/i // Common greetings in other languages
+  ];
+  
+  // Check for off-topic content
+  const offTopicPatterns = [
+    /weather|sports|politics|entertainment|movies|music/i,
+    /cooking|recipes|travel|vacation|personal life/i,
+    /technology|computers|software|games/i
+  ];
+  
+  // Check for sales representative behavior (AI acting as expert instead of customer/administrator)
+  const salesRepBehaviorPatterns = [
+    /I'm happy to help|I'd be happy to help|I can help you|let me help you/i,
+    /what symptoms are you experiencing|what are you looking for|how can I assist/i,
+    /this medication works by|it works by|this is used for|it's effective for/i,
+    /are you looking for something for|do you need something for/i,
+    /my recommendation is|I recommend that you|I suggest that you/i
+  ];
+  
+  // Allow healthcare administrator phrases (these are OK for the persona)
+  const adminAllowedPhrases = [
+    /thanks for coming in|we've had discussions|not sure it's the right fit/i,
+    /why should we invest|what makes it worth|we'd need to train/i,
+    /send the wrong message|legal risks|compliance issues/i
+  ];
+  
+  // Check if text contains non-English content
+  for (const pattern of nonEnglishPatterns) {
+    if (pattern.test(text)) {
+      console.warn("Non-English content detected:", text);
+      return false;
+    }
+  }
+  
+  // Check if text is off-topic
+  for (const pattern of offTopicPatterns) {
+    if (pattern.test(text)) {
+      console.warn("Off-topic content detected:", text);
+      return false;
+    }
+  }
+  
+  // Check if AI is acting like sales rep instead of customer/administrator
+  // But allow healthcare administrator phrases that are part of the script
+  let isActingAsSalesRep = false;
+  for (const pattern of salesRepBehaviorPatterns) {
+    if (pattern.test(text)) {
+      // Check if it's an allowed admin phrase
+      let isAllowedAdminPhrase = false;
+      for (const adminPattern of adminAllowedPhrases) {
+        if (adminPattern.test(text)) {
+          isAllowedAdminPhrase = true;
+          break;
+        }
+      }
+      if (!isAllowedAdminPhrase) {
+        console.warn("AI acting as sales representative instead of customer/administrator:", text);
+        isActingAsSalesRep = true;
+        break;
+      }
+    }
+  }
+  
+  if (isActingAsSalesRep) {
+    return false;
+  }
+  
+  return true;
+}
+
 async function handleRealtimeMessages() {
   for await (const message of realtimeStreaming.messages()) {
     let consoleLog = "" + message.type;
@@ -196,14 +350,23 @@ async function handleRealtimeMessages() {
         if (selectedProduct) {
           makeNewTextBlock(`<< Session Started - Customer interested in ${selectedProduct} >>`);
         } else {
-          makeNewTextBlock("<< Session Started - Customer looking for OTC medications >>");
+          makeNewTextBlock("<< Session Started - Customer interested in Padagis Products >>");
         }
         makeNewTextBlock();
         // Send initial AI message to start the conversation
         await sendInitialAIMessage();
         break;
       case "response.audio_transcript.delta":
-        appendToTextBlock(message.delta);
+        // Validate the response for English-only and on-topic content
+        if (validateResponse(message.delta)) {
+          appendToTextBlock(message.delta);
+        } else {
+          // Log validation failure and send a correction prompt
+          console.warn("Response validation failed for:", message.delta);
+          appendToTextBlock(message.delta); // Still show it but log the issue
+          // Send correction message to guide AI back on track
+          await sendCorrectionMessage();
+        }
         break;
       case "response.audio.delta":
         const binary = atob(message.delta);
@@ -388,22 +551,183 @@ function appendToTextBlock(text: string) {
 // --- Modal controls & transcript analysis ---
 const analysisModal = document.getElementById("analysis-modal") as HTMLDivElement | null;
 const closeModalBtn = document.getElementById("close-modal") as HTMLButtonElement | null;
+const exportAnalysisBtn = document.getElementById("export-analysis") as HTMLButtonElement | null;
 const analyzeBtn = document.getElementById("analyze-transcript") as HTMLButtonElement | null;
 const modalClearDisplayBtn = document.getElementById("clear-display") as HTMLButtonElement | null;
 const insightsLoadingEl = document.getElementById("insights-loading") as HTMLDivElement | null;
 const insightsErrorEl = document.getElementById("insights-error") as HTMLDivElement | null;
 const insightsOutputEl = document.getElementById("insights-output") as HTMLDivElement | null;
+const analysisStatusEl = document.getElementById("analysis-status") as HTMLSpanElement | null;
+const errorMessageEl = document.getElementById("error-message") as HTMLParagraphElement | null;
+
+let lastAnalysisResult: string = "";
+let isAnalysisLoaded = false;
 
 function openModal() {
   if (!analysisModal) return;
   analysisModal.classList.add("open");
   analysisModal.setAttribute("aria-hidden", "false");
+  
+  // Update status and export button state
+  updateAnalysisStatus();
 }
 
 function closeModal() {
   if (!analysisModal) return;
   analysisModal.classList.remove("open");
   analysisModal.setAttribute("aria-hidden", "true");
+}
+
+function updateAnalysisStatus() {
+  if (!analysisStatusEl) return;
+  
+  if (isAnalysisLoaded) {
+    analysisStatusEl.textContent = "Analysis Complete";
+    analysisStatusEl.style.background = "#d1fae5";
+    analysisStatusEl.style.color = "#065f46";
+  } else {
+    analysisStatusEl.textContent = "No Analysis";
+    analysisStatusEl.style.background = "var(--light-teal)";
+    analysisStatusEl.style.color = "var(--primary-teal)";
+  }
+}
+
+function exportAnalysisToFile() {
+  if (!lastAnalysisResult) {
+    alert("No analysis available to export. Please run an analysis first.");
+    return;
+  }
+
+  const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+  const selectedProduct = getProductTopic() || "General";
+  const filename = `Sales_Analysis_${selectedProduct}_${timestamp}.txt`;
+  
+  const transcript = getFullTranscript();
+  const exportContent = `PHARMACEUTICAL SALES PERFORMANCE ANALYSIS
+Generated: ${new Date().toLocaleString()}
+Product Focus: ${selectedProduct}
+==================================================
+
+CONVERSATION TRANSCRIPT:
+${transcript}
+
+==================================================
+
+ANALYSIS RESULTS:
+${lastAnalysisResult}
+
+==================================================
+Export generated by Padagis OTC Sales Training Simulator
+`;
+
+  const blob = new Blob([exportContent], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function createCollapsibleSection(title: string, content: string): string {
+  const sectionId = title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  return `
+    <div class="analysis-section">
+      <button class="section-toggle expanded" data-section="${sectionId}">
+        <span>${title}</span>
+        <span class="toggle-icon">▲</span>
+      </button>
+      <div class="section-content expanded" data-content="${sectionId}">
+        <p>${content.replace(/\n/g, '<br>')}</p>
+      </div>
+    </div>
+  `;
+}
+
+function formatAnalysisWithSections(analysisText: string): string {
+  // Parse the analysis text into sections
+  const sections = [];
+  const lines = analysisText.split('\n');
+  let currentSection = { title: '', content: '' };
+  
+  // Define section mappings without icons
+  const sectionMappings = [
+    { keywords: ['sales performance', 'summary'], title: 'Sales Performance Summary' },
+    { keywords: ['key strengths', 'strengths'], title: 'Key Strengths' },
+    { keywords: ['areas for improvement', 'improvement', 'weaknesses'], title: 'Areas for Improvement' },
+    { keywords: ['customer engagement'], title: 'Customer Engagement' },
+    { keywords: ['action items', 'recommendations'], title: 'Action Items' },
+    { keywords: ['product knowledge'], title: 'Product Knowledge Assessment' }
+  ];
+
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    if (!trimmedLine) continue;
+
+    // Check if this line starts a new section
+    const isHeader = /^\d+\.\s|\*\*/.test(trimmedLine) || trimmedLine.endsWith(':');
+    
+    if (isHeader) {
+      // Save previous section if it has content
+      if (currentSection.title && currentSection.content) {
+        sections.push({ ...currentSection });
+      }
+      
+      // Find matching section mapping
+      const mapping = sectionMappings.find(m => 
+        m.keywords.some(keyword => trimmedLine.toLowerCase().includes(keyword))
+      );
+      
+      currentSection = {
+        title: mapping ? mapping.title : trimmedLine.replace(/^\d+\.\s|\*\*/g, '').replace(/:/g, ''),
+        content: ''
+      };
+    } else {
+      currentSection.content += (currentSection.content ? '\n' : '') + trimmedLine;
+    }
+  }
+  
+  // Add the last section
+  if (currentSection.title && currentSection.content) {
+    sections.push(currentSection);
+  }
+  
+  // If no clear sections were found, create a single section
+  if (sections.length === 0) {
+    sections.push({
+      title: 'Analysis Results',
+      content: analysisText
+    });
+  }
+
+  return sections.map(section => 
+    createCollapsibleSection(section.title, section.content)
+  ).join('');
+}
+
+function setupCollapsibleSections() {
+  const toggleButtons = document.querySelectorAll('.section-toggle');
+  toggleButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const sectionId = button.getAttribute('data-section');
+      const content = document.querySelector(`[data-content="${sectionId}"]`) as HTMLElement;
+      const icon = button.querySelector('.toggle-icon') as HTMLElement;
+      
+      if (content) {
+        const isExpanded = content.classList.contains('expanded');
+        
+        if (isExpanded) {
+          content.classList.remove('expanded');
+          button.classList.remove('expanded');
+          if (icon) icon.textContent = '▼';
+        } else {
+          content.classList.add('expanded');
+          button.classList.add('expanded');
+          if (icon) icon.textContent = '▲';
+        }
+      }
+    });
+  });
 }
 
 function getFullTranscript(): string {
@@ -418,10 +742,20 @@ async function analyzeCurrentTranscript() {
 
   const transcriptRaw = getFullTranscript();
   if (!transcriptRaw) {
-    insightsErrorEl.textContent = "No transcript to analyze.";
+    if (errorMessageEl) {
+      errorMessageEl.textContent = "No transcript to analyze. Please have a conversation first.";
+    }
     insightsErrorEl.classList.remove("hidden");
     return;
   }
+
+  // Clear previous results and show loading
+  insightsErrorEl.classList.add("hidden");
+  insightsOutputEl.innerHTML = "";
+  insightsLoadingEl.classList.remove("hidden");
+  analyzeBtn.disabled = true;
+  isAnalysisLoaded = false;
+  updateAnalysisStatus();
 
   // Optional truncate to avoid token overflow for very long sessions
   const maxChars = 12000;
@@ -429,18 +763,13 @@ async function analyzeCurrentTranscript() {
     ? transcriptRaw.slice(-maxChars)
     : transcriptRaw;
 
-  insightsErrorEl.classList.add("hidden");
-  insightsOutputEl.textContent = "";
-  insightsLoadingEl.classList.remove("hidden");
-  analyzeBtn.disabled = true;
-
   try {
     const endpoint = import.meta.env.VITE_CHAT_OPEN_AI_ENDPOINT || "";
     const key = import.meta.env.VITE_CHAT_OPEN_AI_KEY || "";
     const deploymentOrModel = import.meta.env.VITE_CHAT_OPEN_AI_DEPLOYMENT || "";
 
     if (!key) {
-      throw new Error("Missing API key");
+      throw new Error("Missing API key for analysis");
     }
 
     let url = "";
@@ -450,27 +779,14 @@ async function analyzeCurrentTranscript() {
     // Get the selected product for context
     const selectedProduct = getProductTopic();
     
-    // Create product-specific analysis prompt
-    let systemPrompt = "You are an expert pharmaceutical sales coach analyzing an OTC medication sales consultation. ";
+    // Create analysis prompt focused on pharmaceutical sales coaching
+    let systemPrompt = "You are an expert pharmaceutical sales coach analyzing a sales consultation. ";
     
     if (selectedProduct && selectedProduct !== "General Customer (browsing)") {
-      systemPrompt += `The customer was interested in the ${selectedProduct}. `;
-      
-      // Add product-specific coaching based on the medication
-      if (selectedProduct.includes("Ibuprofen")) {
-        systemPrompt += "This is an NSAID pain reliever for minor aches and pains. Focus on how well the sales representative explained pain relief benefits, dosing guidelines, potential stomach concerns, and compared it with other pain relievers. ";
-      } else if (selectedProduct.includes("Acetaminophen")) {
-        systemPrompt += "This is a pain and fever reliever that's gentle on the stomach. Focus on how well the sales representative addressed pain/fever relief benefits, liver safety considerations, and maximum daily dosing. ";
-      } else if (selectedProduct.includes("Diphenhydramine")) {
-        systemPrompt += "This is a sleep aid medication. Focus on how well the sales representative explained sleep benefits, next-day drowsiness concerns, dependency questions, and proper usage timing. ";
-      } else if (selectedProduct.includes("Loratadine")) {
-        systemPrompt += "This is a non-drowsy allergy medication. Focus on how well the sales representative explained allergy relief benefits, non-drowsy advantages, and daily usage for seasonal allergies. ";
-      } else if (selectedProduct.includes("Omeprazole")) {
-        systemPrompt += "This is an acid reducer for frequent heartburn. Focus on how well the sales representative explained heartburn prevention vs. treatment, proper usage timing, and long-term use considerations. ";
-      }
-    } else {
-      systemPrompt += "This was a general consultation where the customer was seeking OTC medication guidance. Focus on how well the sales representative identified customer health needs and guided them toward appropriate medication options. ";
+      systemPrompt += `The customer was interested in ${selectedProduct}. `;
     }
+    
+    systemPrompt += "Focus on how well the sales representative handled the customer's questions, addressed concerns, demonstrated product knowledge, and managed objections during this pharmaceutical sales interaction. ";
     
     systemPrompt += `
     
@@ -533,17 +849,34 @@ Focus on practical pharmaceutical sales coaching advice to improve performance w
     if (!content || content.trim().length === 0) {
       // Check if there's an error in the response
       if (data?.error) {
-        insightsOutputEl.textContent = `API Error: ${JSON.stringify(data.error)}`;
+        if (errorMessageEl) {
+          errorMessageEl.textContent = `API Error: ${JSON.stringify(data.error)}`;
+        }
       } else {
-        insightsOutputEl.textContent = "No insights returned from API. Please try again.";
+        if (errorMessageEl) {
+          errorMessageEl.textContent = "No insights returned from API. Please try again.";
+        }
       }
+      insightsErrorEl.classList.remove("hidden");
     } else {
-      insightsOutputEl.textContent = content;
+      // Store the analysis result and format it with collapsible sections
+      lastAnalysisResult = content;
+      isAnalysisLoaded = true;
+      
+      // Create the analysis content with collapsible sections
+      const formattedContent = formatAnalysisWithSections(content);
+      insightsOutputEl.innerHTML = `<div class="analysis-content">${formattedContent}</div>`;
+      
+      // Add event listeners for collapsible sections
+      setupCollapsibleSections();
+      updateAnalysisStatus();
     }
     
   } catch (err: any) {
     console.error("Analysis error:", err);
-    insightsErrorEl.textContent = err?.message || String(err);
+    if (errorMessageEl) {
+      errorMessageEl.textContent = err?.message || String(err);
+    }
     insightsErrorEl.classList.remove("hidden");
   } finally {
     insightsLoadingEl.classList.add("hidden");
@@ -603,6 +936,20 @@ function restoreConversationPlaceholder() {
       <p>Your conversation with the AI customer will appear here. Start recording to begin the sales simulation.</p>
     </div>
   `;
+  
+  // Reset analysis state
+  lastAnalysisResult = "";
+  isAnalysisLoaded = false;
+  if (insightsOutputEl) {
+    insightsOutputEl.innerHTML = `
+      <div class="no-analysis-placeholder">
+        <div class="placeholder-icon">�</div>
+        <h4>Ready for Analysis</h4>
+        <p>Click "Analyze Sales Performance" to get detailed coaching insights on your pharmaceutical sales conversation.</p>
+      </div>
+    `;
+  }
+  updateAnalysisStatus();
 }
 
 formClearAllButton.addEventListener("click", async () => {
@@ -611,6 +958,7 @@ formClearAllButton.addEventListener("click", async () => {
 
 // Modal event wiring
 closeModalBtn?.addEventListener("click", () => closeModal());
+exportAnalysisBtn?.addEventListener("click", () => exportAnalysisToFile());
 analysisModal?.addEventListener("click", (e) => {
   const target = e.target as HTMLElement;
   if (target?.dataset?.close === "true") {

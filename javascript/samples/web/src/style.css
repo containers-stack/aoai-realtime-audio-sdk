@@ -412,7 +412,7 @@ button[disabled]::before {
   display: none;
 }
 
-/* Professional Modal Design */
+/* Professional Modal Design with Enhanced Features */
 .modal {
   position: fixed;
   inset: 0;
@@ -438,10 +438,13 @@ button[disabled]::before {
   position: relative;
   background: var(--white);
   border-radius: 12px;
-  max-width: 900px;
+  max-width: 950px;
   width: 100%;
+  max-height: 90vh;
   box-shadow: 0 20px 40px rgba(0, 93, 93, 0.15);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   animation: modalSlideIn 0.3s ease-out;
 }
 
@@ -463,6 +466,7 @@ button[disabled]::before {
   padding: 1.5rem 2rem;
   border-bottom: 2px solid var(--light-teal);
   background: linear-gradient(135deg, var(--light-teal), rgba(230, 245, 245, 0.5));
+  flex-shrink: 0;
 }
 
 .modal-title {
@@ -470,6 +474,12 @@ button[disabled]::before {
   font-size: 1.375rem;
   font-weight: 600;
   color: var(--primary-teal);
+}
+
+.modal-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 .icon-btn {
@@ -482,22 +492,256 @@ button[disabled]::before {
   cursor: pointer;
   border-radius: var(--border-radius);
   transition: var(--transition);
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .icon-btn:hover {
   background: var(--border-color);
   color: var(--neutral-dark);
 }
-/* Modal Body and Actions */
-.modal-body {
-  padding: 2rem;
+
+.export-btn:hover {
+  background: var(--secondary-teal);
+  color: var(--white);
 }
 
-.modal-actions {
+/* Modal Body - Compact Dashboard Style */
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  background: #fafbfc;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Action Bar - Clean Button Layout */
+.action-bar {
   display: flex;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.analyze-btn {
+  background: linear-gradient(135deg, var(--primary-teal), var(--secondary-teal));
+  color: var(--white);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.95rem;
+}
+
+.analyze-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 93, 93, 0.25);
+}
+
+.analyze-btn:disabled {
+  background: var(--neutral-medium);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.clear-btn {
+  background: var(--white);
+  color: var(--neutral-dark);
+  border: 2px solid var(--border-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.95rem;
+}
+
+.clear-btn:hover {
+  background: var(--light-teal);
+  border-color: var(--primary-teal);
+  color: var(--primary-teal);
+}
+
+/* Loading States - Minimal Design */
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--light-teal);
+  border-top: 2px solid var(--secondary-teal);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error States - Clean Design */
+.error-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--border-radius);
+  color: #dc2626;
+  margin-bottom: 1rem;
+}
+
+.error-content strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.error-content p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Analysis Container - Dashboard Style */
+.analysis-container {
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  min-height: 300px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  color: var(--neutral-medium);
+  height: 100%;
+  min-height: 200px;
+}
+
+.empty-state h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--neutral-dark);
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 400px;
+}
+
+.no-analysis-placeholder h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--neutral-dark);
+}
+
+.no-analysis-placeholder p {
+  margin: 0;
+  font-size: 0.95rem;
+  max-width: 400px;
+}
+
+/* Analysis Results with Collapsible Sections */
+.analysis-content {
+  padding: 1.5rem;
+}
+
+.analysis-section {
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  background: var(--white);
+}
+
+.analysis-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-toggle {
+  width: 100%;
+  background: var(--light-teal);
+  border: none;
+  padding: 1rem 1.5rem;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  color: var(--primary-teal);
+  transition: var(--transition);
+}
+
+.section-toggle:hover {
+  background: rgba(230, 245, 245, 0.8);
+}
+
+.section-toggle.expanded {
+  background: var(--primary-teal);
+  color: var(--white);
+}
+
+.toggle-icon {
+  font-size: 1.2rem;
+  transition: transform 0.2s ease;
+}
+
+.section-toggle.expanded .toggle-icon {
+  transform: rotate(0deg);
+}
+
+.section-content {
+  padding: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.section-content.expanded {
+  padding: 1.5rem;
+  max-height: 1000px;
+}
+
+.section-content p {
+  margin: 0 0 1rem 0;
+  line-height: 1.6;
+  color: var(--neutral-dark);
+}
+
+.section-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Hidden utility */
+.hidden {
+  display: none !important;
 }
 
 /* Secondary Button Variant */
